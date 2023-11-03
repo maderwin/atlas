@@ -1,0 +1,108 @@
+services:
+  - id: 1
+    name: PostgreSQL
+    description: PostgreSQL instance is a relational database management system (RDBMS) that supports a wide range of features, including data integrity, transaction processing, and SQL querying. It is an open-source object-relational database system.
+    url: http://postgres.internal.example.com
+    tags:
+      - db
+    links:
+      - name: Dashboard
+        url: http://grafana.internal.example.com/postgres-dashboard
+      - name: Configuration
+        url: http://postgres.internal.example.com/config.yaml
+      - name: Logs
+        url: http://postgres.internal.example.com/logs
+      - name: Backup
+        url: s3://backup-bucket/postgres/
+    admins:
+      - name: Database Admin
+        username: db_admin
+        url: https://t.me/db_admin_of_postgres
+  - id: 2
+    name: ElasticSearch
+    description: ElasticSearch is a search engine based on the Lucene library, which is an open-source full-text search engine library. It provides a distributed, multitenant-capable full-text search engine with an HTTP web interface and JSON documents.
+    tags:
+      - db
+      - search
+    url: http://elastic.internal.example.com
+    links:
+      - name: Dashboard
+        url: http://grafana.internal.example.com/elastic
+      - name: Configuration
+        url: http://elastic.internal.example.com/config.json
+      - name: Logs
+        url: http://elastic.internal.example.com/logs
+      - name: Backup
+        url: s3://backup-bucket/elastic/
+    admins:
+      - name: Search Admin
+        username: search_admin
+        url: https://t.me/search_admin_of_elastic
+  - id: 3
+    name: Jenkins
+    tags:
+      - ci
+    description: Jenkins is an open-source continuous integration and continuous delivery server. It provides a web-based user interface for managing builds, as well as an API for integrating with other tools and systems.
+    url: http://jenkins.internal.example.com
+    links:
+      - name: Documentation
+        url: https://jenkins.io/
+      - name: Backup
+        url: s3://backup-bucket/jenkins/
+    admins:
+      - name: Jenkins Admin
+        username: jenkins_admin
+        url: https://t.me/jenkins_admin_of_jenkins
+  - id: 4
+    name: RabbitMQ
+    description: RabbitMQ is an open-source message broker software that implements the Advanced Message Queuing Protocol (AMQP). It is used for message-oriented middleware, which allows for the decoupling of applications.
+    tags:
+      - queue
+    url: http://rabbitmq.internal.example.com
+    links:
+      - name: Management
+        url: http://rabbitmq.internal.example.com/management
+      - name: Configuration
+        url: http://rabbitmq.internal.example.com/config.json
+      - name: Logs
+        url: http://rabbitmq.internal.example.com/logs
+      - name: Backup
+        url: s3://backup-bucket/rabbitmq/
+    admins:
+      - name: Messaging Admin
+        username: messaging_admin
+        url: https://t.me/messaging_admin_of_rabbitmq
+  - id: 6
+    name: Nginx
+    description: Nginx is an open-source web server that is widely used for serving static and dynamic content, as well as for load balancing, security, and reverse proxying.
+    tags:
+      - web
+      - proxy
+    url: http://nginx.internal.example.com
+    links:
+      - name: Configuration
+        url: http://nginx.internal.example.com/nginx.conf
+      - name: Logs
+        url: http://nginx.internal.example.com/logs
+      - name: Backup
+        url: s3://backup-bucket/nginx/
+    admins:
+      - name: Web Admin
+        username: web_admin
+        url: https://t.me/web_admin_of_nginx
+  - id: 7
+    name: Redis
+    description: Redis is an open-source, in-memory data structure store, used as a database, cache and message broker. It supports data structures such as strings, hashes, lists, sets and sorted sets.
+    tags:
+      - db
+      - cache
+    url: http://redis.internal.example.com
+    links:
+      - name: Stats
+        url: http://redis.internal.example.com/stats
+      - name: Configuration
+        url: http://redis.internal.example.com/config.yml
+      - name: Logs
+        url: http://redis.internal.example.com/logs
+      - name: Backup
+        url: s3://backup-bucket/redis/
