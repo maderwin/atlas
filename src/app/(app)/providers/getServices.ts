@@ -1,3 +1,4 @@
+import { stat, readFile } from "fs/promises";
 import { parse } from "yaml";
 import * as z from "zod";
 
@@ -17,7 +18,7 @@ const ServiceAdmin = z.object({
 export type TServiceAdmin = z.infer<typeof ServiceAdmin>;
 
 const Service = z.object({
-    id: z.number(),
+    id: z.string(),
     name: z.string(),
     description: z.string().optional(),
     url: z.string().optional(),
@@ -42,17 +43,25 @@ export type TServicesSchema = z.infer<typeof ServicesSchema>;
 
 export type TServicesResponse = z.SafeParseReturnType<unknown, TServicesSchema>;
 
+const getFile = async (path: string): Promise<string> => {
+    if (path.startsWith("http://") || path.startsWith("https://")) {
+        const res = await fetch(path, { next: { revalidate: process.env.SERVICES_YAML_CACHE_TIMEOUT ?? 30, tags: ["services"] } });
+
+        return res.text();
+    }
+
+    const buffer = await readFile(path);
+
+    return buffer.toString();
+}
+
 export const getServices = async (): Promise<TServicesResponse | null> => {
 
     if(!process.env.SERVICES_YAML_URL) {
         return null;
     }
 
-    const res = await fetch(process.env.SERVICES_YAML_URL, { next: { revalidate: process.env.SERVICES_YAML_CACHE_TIMEOUT ?? 30, tags: ["services"] } });
-
-    const data = await res.text();
-
-    const jsonData = await parse(data);
+    const jsonData = await parse(await getFile(process.env.SERVICES_YAML_URL));
 
     const parsedData = await ServicesSchema.safeParseAsync(jsonData);
 

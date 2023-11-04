@@ -3,18 +3,38 @@
 import cn from "classnames";
 import { Badge } from "flowbite-react";
 import Link from "next/link";
-import { FC } from "react";
+import { FC, useCallback, useMemo } from "react";
 import { TService, TServiceAdmin, TServiceLink } from "../../../providers/getServices";
 import { useSearchContext } from "../../SearchContext/SearchContext";
 
 const mdash = "\u2014";
 
-const Tag: FC<{ tag: string }> = ({ tag }) => {
-    const { setSearchString } = useSearchContext();
+const classBadgeDefault = cn(
+    "bg-gray-200",
+    "hover:bg-gray-300",
+    "dark:text-white",
+    "dark:bg-gray-600",
+    "dark:hover:bg-gray-500",
+);
 
-    const handleClick = () => {
-        setSearchString(`[${tag}]`);
-    };
+const classBadgeSelected = cn(
+    "bg-yellow-200",
+    "hover:bg-yellow-300",
+    "dark:text-white",
+    "dark:bg-yellow-600",
+    "dark:hover:bg-yellow-500",
+);
+
+const Tag: FC<{ tag: string }> = ({ tag }) => {
+    const { filteredSearchString, setSearchString } = useSearchContext();
+
+    const tagString = `[${tag}]`;
+
+    const isSelected = useMemo(() => filteredSearchString.includes(tagString), [filteredSearchString, tagString]);
+
+    const handleClick = useCallback(() => {  
+        setSearchString(isSelected ? filteredSearchString.replace(tagString, " ") : tagString);
+    }, [filteredSearchString, setSearchString, tagString]);
 
     return (
         <Badge
@@ -22,11 +42,7 @@ const Tag: FC<{ tag: string }> = ({ tag }) => {
                 "inline",
                 "cursor-pointer",
                 "text-black",
-                "bg-gray-200",
-                "hover:bg-gray-300",
-                "dark:text-white",
-                "dark:bg-gray-600",
-                "dark:hover:bg-gray-500",
+                isSelected ? classBadgeSelected : classBadgeDefault,
             )}
             onClick={handleClick}
         >
@@ -100,7 +116,7 @@ const ServiceAdmins: FC<{ admins: TServiceAdmin[] }> = ({ admins }) => (
     </ul>
 );
 
-export const ServiceEntry: FC<{ service: TService | (TService & { score: number }) }> = ({ service }) => (
+export const ServiceEntry: FC<{ service: TService, score?: number}> = ({ service, score }) => (
     <div className="rounded-md p-5 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700">
         <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12">
@@ -109,9 +125,9 @@ export const ServiceEntry: FC<{ service: TService | (TService & { score: number 
 
                     {service.tags && <ServiceTags tags={service.tags} />}
 
-                    {"score" in service && (
+                    {typeof score !== "undefined" && (
                         <div className="absolute right-0 text-xs text-gray-400 dark:text-gray-600">
-                            {service.score.toFixed(3)}
+                            {score.toFixed(3)}
                         </div>
                     )}
                 </div>

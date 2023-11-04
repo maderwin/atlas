@@ -1,10 +1,11 @@
 services:
-  - id: 1
+  - id: hahn/postgres
     name: PostgreSQL
-    description: PostgreSQL instance is a relational database management system (RDBMS) that supports a wide range of features, including data integrity, transaction processing, and SQL querying. It is an open-source object-relational database system.
+    description: A relational database management system (RDBMS) that supports a wide range of features, including data integrity, transaction processing, and SQL querying.
     url: http://postgres.internal.example.com
     tags:
       - db
+      - cluster:hahn
     links:
       - name: Dashboard
         url: http://grafana.internal.example.com/postgres-dashboard
@@ -15,15 +16,16 @@ services:
       - name: Backup
         url: s3://backup-bucket/postgres/
     admins:
-      - name: Database Admin
-        username: db_admin
-        url: https://t.me/db_admin_of_postgres
-  - id: 2
+      - name: John Smith
+        username: john_smith
+        url: https://t.me/john_smith
+  - id: hahn/elastic
     name: ElasticSearch
-    description: ElasticSearch is a search engine based on the Lucene library, which is an open-source full-text search engine library. It provides a distributed, multitenant-capable full-text search engine with an HTTP web interface and JSON documents.
+    description: A search engine based on the Lucene library, which is an open-source full-text search engine library.
     tags:
       - db
       - search
+      - cluster:hahn
     url: http://elastic.internal.example.com
     links:
       - name: Dashboard
@@ -35,29 +37,15 @@ services:
       - name: Backup
         url: s3://backup-bucket/elastic/
     admins:
-      - name: Search Admin
-        username: search_admin
-        url: https://t.me/search_admin_of_elastic
-  - id: 3
-    name: Jenkins
-    tags:
-      - ci
-    description: Jenkins is an open-source continuous integration and continuous delivery server. It provides a web-based user interface for managing builds, as well as an API for integrating with other tools and systems.
-    url: http://jenkins.internal.example.com
-    links:
-      - name: Documentation
-        url: https://jenkins.io/
-      - name: Backup
-        url: s3://backup-bucket/jenkins/
-    admins:
-      - name: Jenkins Admin
-        username: jenkins_admin
-        url: https://t.me/jenkins_admin_of_jenkins
-  - id: 4
+      - name: Jane Doe
+        username: jane_doe
+        url: https://t.me/jane_doe
+  - id: hahn/rabbit
     name: RabbitMQ
-    description: RabbitMQ is an open-source message broker software that implements the Advanced Message Queuing Protocol (AMQP). It is used for message-oriented middleware, which allows for the decoupling of applications.
+    description: An open-source message broker software that implements the Advanced Message Queuing Protocol (AMQP).
     tags:
       - queue
+      - cluster:hahn
     url: http://rabbitmq.internal.example.com
     links:
       - name: Management
@@ -69,15 +57,16 @@ services:
       - name: Backup
         url: s3://backup-bucket/rabbitmq/
     admins:
-      - name: Messaging Admin
-        username: messaging_admin
-        url: https://t.me/messaging_admin_of_rabbitmq
-  - id: 6
+      - name: Mary Jones
+        username: mary_jones
+        url: https://t.me/mary_jones
+  - id: hahn/nginx
     name: Nginx
-    description: Nginx is an open-source web server that is widely used for serving static and dynamic content, as well as for load balancing, security, and reverse proxying.
+    description: An open-source web server that is widely used for serving static and dynamic content, as well as for load balancing, security, and reverse proxying.
     tags:
       - web
       - proxy
+      - cluster:hahn
     url: http://nginx.internal.example.com
     links:
       - name: Configuration
@@ -87,15 +76,16 @@ services:
       - name: Backup
         url: s3://backup-bucket/nginx/
     admins:
-      - name: Web Admin
-        username: web_admin
-        url: https://t.me/web_admin_of_nginx
-  - id: 7
+      - name: Sally Brown
+        username: sally_brown
+        url: https://t.me/sally_brown
+  - id: hahn/redis
     name: Redis
-    description: Redis is an open-source, in-memory data structure store, used as a database, cache and message broker. It supports data structures such as strings, hashes, lists, sets and sorted sets.
+    description: An open-source, in-memory data structure store, used as a database, cache and message broker.
     tags:
       - db
       - cache
+      - cluster:hahn
     url: http://redis.internal.example.com
     links:
       - name: Stats
@@ -106,3 +96,115 @@ services:
         url: http://redis.internal.example.com/logs
       - name: Backup
         url: s3://backup-bucket/redis/
+  - id: banach/postgres
+    name: PostgreSQL
+    description: A relational database management system (RDBMS) that supports a wide range of features, including data integrity, transaction processing, and SQL querying.
+    url: http://postgres.internal.example.com
+    tags:
+      - db
+      - cluster:banach
+    links:
+      - name: Dashboard
+        url: http://grafana.internal.example.com/postgres-dashboard
+      - name: Configuration
+        url: http://postgres.internal.example.com/config.yaml
+      - name: Logs
+        url: http://postgres.internal.example.com/logs
+      - name: Backup
+        url: s3://backup-bucket/postgres/
+    admins:
+      - name: John Smith
+        username: john_smith
+        url: https://t.me/john_smith
+  - id: banach/elastic
+    name: ElasticSearch
+    description: A search engine based on the Lucene library, which is an open-source full-text search engine library.
+    tags:
+      - db
+      - search
+      - cluster:banach
+    url: http://elastic.internal.example.com
+    links:
+      - name: Dashboard
+        url: http://grafana.internal.example.com/elastic
+      - name: Configuration
+        url: http://elastic.internal.example.com/config.json
+      - name: Logs
+        url: http://elastic.internal.example.com/logs
+      - name: Backup
+        url: s3://backup-bucket/elastic/
+    admins:
+      - name: Jane Doe
+        username: jane_doe
+        url: https://t.me/jane_doe
+  - id: banach/rabbitmq
+    name: RabbitMQ
+    description: An open-source message broker software that implements the Advanced Message Queuing Protocol (AMQP).
+    tags:
+      - queue
+      - cluster:banach
+    url: http://rabbitmq.internal.example.com
+    links:
+      - name: Management
+        url: http://rabbitmq.internal.example.com/management
+      - name: Configuration
+        url: http://rabbitmq.internal.example.com/config.json
+      - name: Logs
+        url: http://rabbitmq.internal.example.com/logs
+      - name: Backup
+        url: s3://backup-bucket/rabbitmq/
+    admins:
+      - name: Mary Jones
+        username: mary_jones
+        url: https://t.me/mary_jones
+  - id: banach/nginx
+    name: Nginx
+    description: An open-source web server that is widely used for serving static and dynamic content, as well as for load balancing, security, and reverse proxying.
+    tags:
+      - web
+      - proxy
+      - cluster:banach
+    url: http://nginx.internal.example.com
+    links:
+      - name: Configuration
+        url: http://nginx.internal.example.com/nginx.conf
+      - name: Logs
+        url: http://nginx.internal.example.com/logs
+      - name: Backup
+        url: s3://backup-bucket/nginx/
+    admins:
+      - name: Sally Brown
+        username: sally_brown
+        url: https://t.me/sally_brown
+  - id: banach/redis
+    name: Redis
+    description: An open-source, in-memory data structure store, used as a database, cache and message broker.
+    tags:
+      - db
+      - cache
+      - cluster:banach
+    url: http://redis.internal.example.com
+    links:
+      - name: Stats
+        url: http://redis.internal.example.com/stats
+      - name: Configuration
+        url: http://redis.internal.example.com/config.yml
+      - name: Logs
+        url: http://redis.internal.example.com/logs
+      - name: Backup
+        url: s3://backup-bucket/redis/
+  - id: jenkins
+    name: Jenkins
+    tags:
+      - ci
+    description: An open-source continuous integration and continuous delivery server.
+    url: http://jenkins.internal.example.com
+    links:
+      - name: Documentation
+        url: https://jenkins.io/
+      - name: Backup
+        url: s3://backup-bucket/jenkins/
+    admins:
+      - name: Peter Brown
+        username: peter_brown
+        url: https://t.me/peter_brown

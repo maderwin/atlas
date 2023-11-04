@@ -9,7 +9,6 @@ const getSearchContextValue = () => {
             searchString
                 .toLowerCase()
                 .trim()
-                .replaceAll(/[^\w\d\[\]]/g, " ")
                 .replaceAll(/\s+/g, " "),
 
         [searchString],
