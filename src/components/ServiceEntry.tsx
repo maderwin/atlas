@@ -77,9 +77,7 @@ export function ServiceEntry({ service, score, onTagClick }: ServiceEntryProps) 
           ))}
 
           {/* Status badge */}
-          {service.status_url && (
-            <StatusBadge url={service.status_url} />
-          )}
+          {service.status_url && <StatusBadge url={service.status_url} />}
 
           {/* Score */}
           {score !== undefined && (
@@ -119,7 +117,12 @@ export function ServiceEntry({ service, score, onTagClick }: ServiceEntryProps) 
                 {service.admins.map((admin) => (
                   <span key={admin.username}>
                     {admin.url ? (
-                      <a href={admin.url} target="_blank" rel="noopener noreferrer" className="hover:text-primary">
+                      <a
+                        href={admin.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-primary"
+                      >
                         @{admin.username}
                       </a>
                     ) : (
@@ -146,7 +149,9 @@ export function ServiceEntry({ service, score, onTagClick }: ServiceEntryProps) 
       <Modal open={modalLink !== null} onClose={() => setModalLink(null)}>
         {modalLink && (
           <div>
-            <h3 className="mb-4 text-lg font-semibold">{service.name} — {modalLink.name}</h3>
+            <h3 className="mb-4 text-lg font-semibold">
+              {service.name} — {modalLink.name}
+            </h3>
             <LinkDetail link={modalLink} />
             <div className="mt-4 flex justify-end">
               <a

@@ -32,7 +32,10 @@ export function StatusBadge({ url, label = "Status" }: StatusBadgeProps) {
 
     check();
     const interval = setInterval(check, 30_000);
-    return () => { cancelled = true; clearInterval(interval); };
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
   }, [url]);
 
   const colors: Record<Status, string> = {

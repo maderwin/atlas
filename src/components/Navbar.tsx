@@ -37,7 +37,13 @@ export function Navbar({ query, onQueryChange }: NavbarProps) {
   return (
     <nav className="fixed top-0 right-0 left-0 z-20 flex items-center gap-4 border-b border-gray-200 bg-white/80 px-4 py-2 backdrop-blur-sm sm:px-8 dark:border-gray-700 dark:bg-gray-900/80">
       <div className="flex items-center gap-2 text-xl font-semibold">
-        <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg
+          className="h-6 w-6"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
           <path d="M12 2L2 19h20L12 2z" />
           <circle cx="12" cy="13" r="3" />
         </svg>
@@ -45,7 +51,13 @@ export function Navbar({ query, onQueryChange }: NavbarProps) {
       </div>
 
       <div className="relative flex-1 max-w-md">
-        <svg className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <svg
+          className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          viewBox="0 0 24 24"
+        >
           <circle cx="11" cy="11" r="8" />
           <path d="M21 21l-4.35-4.35" />
         </svg>
@@ -61,7 +73,13 @@ export function Navbar({ query, onQueryChange }: NavbarProps) {
             onClick={handleClear}
             className="absolute top-1/2 right-2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
           >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <svg
+              className="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
               <path d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>

@@ -8,6 +8,10 @@ pre-commit:
     - name: typecheck
       run: pnpm tsc -b --noEmit
 
+    - name: oxfmt
+      glob: "*.{js,ts,jsx,tsx}"
+      run: pnpm oxfmt {staged_files}
+
     - name: stylelint
       glob: "*.css"
       run: pnpm stylelint {staged_files}
