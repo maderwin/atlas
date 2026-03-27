@@ -191,16 +191,15 @@ export function useSearch(services: Service[], query: string): SearchResultItem[
     return () => clearTimeout(debounceRef.current);
   }, [query]);
 
-  return useMemo(() => {
+  // Fzf results — only recompute when query or fzf instances change
+  const fzfResults = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return null;
     if (/^\[.*\]$/.test(q)) {
       return tagFzf.find(q).map((r) => ({ service: r.item, score: r.score }));
     }
 
-    // Fzf search with layout/phonetic variants
     const variants = queryVariants(q);
-    const seen = new Set<string>();
     let bestFzf: FzfResultItem<Service>[] = [];
     for (const variant of variants) {
       const results = fzf.find(variant);
@@ -209,37 +208,41 @@ export function useSearch(services: Service[], query: string): SearchResultItem[
       }
     }
 
-    // Build merged result map: id → {service, score, semantic}
-    const merged = new Map<string, SearchResultItem>();
-
-    // Add fzf results
-    if (bestFzf.length > 0) {
-      const topScore = bestFzf[0]!.score;
-      for (const r of bestFzf) {
-        if (r.score < topScore * 0.5) break;
-        if (!seen.has(r.item.id)) {
-          seen.add(r.item.id);
-          merged.set(r.item.id, { service: r.item, score: r.score });
-        }
+    if (bestFzf.length === 0) return [];
+    const topScore = bestFzf[0]!.score;
+    const seen = new Set<string>();
+    const items: SearchResultItem[] = [];
+    for (const r of bestFzf) {
+      if (r.score < topScore * 0.5) break;
+      if (!seen.has(r.item.id)) {
+        seen.add(r.item.id);
+        items.push({ service: r.item, score: r.score });
       }
     }
+    return items;
+  }, [query, fzf, tagFzf]);
 
-    // Merge semantic results — add services not found by fzf
+  // Merge fzf + semantic — recomputes when either changes
+  return useMemo(() => {
+    if (fzfResults === null) return null;
+
+    // Tag search — no semantic merge
+    if (query.trim().startsWith("[")) return fzfResults;
+
+    if (semanticResults.size === 0) return fzfResults;
+
+    const fzfIds = new Set(fzfResults.map((r) => r.service.id));
     const serviceMap = new Map(services.map((s) => [s.id, s]));
+    const extra: SearchResultItem[] = [];
     for (const [id, score] of semanticResults) {
-      if (!merged.has(id)) {
+      if (!fzfIds.has(id)) {
         const svc = serviceMap.get(id);
-        if (svc) {
-          merged.set(id, { service: svc, score: score * 100, semantic: true });
-        }
+        if (svc) extra.push({ service: svc, score: score * 100, semantic: true });
       }
     }
 
-    // Sort: fzf results first (higher scores), then semantic
-    return [...merged.values()].sort((a, b) => {
-      if (a.semantic && !b.semantic) return 1;
-      if (!a.semantic && b.semantic) return -1;
-      return b.score - a.score;
-    });
-  }, [query, fzf, tagFzf, semanticResults, services]);
+    if (extra.length === 0) return fzfResults;
+
+    return [...fzfResults, ...extra.sort((a, b) => b.score - a.score)];
+  }, [fzfResults, semanticResults, services, query]);
 }

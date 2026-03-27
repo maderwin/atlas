@@ -70,8 +70,19 @@ export function useServices() {
 
   useEffect(() => {
     refresh();
-    const interval = setInterval(refresh, REFRESH_INTERVAL);
-    return () => clearInterval(interval);
+    let interval = setInterval(refresh, REFRESH_INTERVAL);
+    const onVisibility = () => {
+      clearInterval(interval);
+      if (!document.hidden) {
+        refresh();
+        interval = setInterval(refresh, REFRESH_INTERVAL);
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, [refresh]);
 
   return { services, error, loading, lastUpdated, refresh };

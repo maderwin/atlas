@@ -34,6 +34,33 @@ async function check(url: string) {
   }
 }
 
+function startPolling(url: string) {
+  if (intervals.has(url)) return;
+  check(url);
+  intervals.set(url, setInterval(() => check(url), 30_000));
+}
+
+function stopPolling(url: string) {
+  const id = intervals.get(url);
+  if (id != null) {
+    clearInterval(id);
+    intervals.delete(url);
+  }
+}
+
+// Pause/resume polling on tab visibility
+if (typeof document !== "undefined") {
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      for (const url of intervals.keys()) stopPolling(url);
+    } else {
+      for (const url of refCounts.keys()) {
+        if ((refCounts.get(url) ?? 0) > 0) startPolling(url);
+      }
+    }
+  });
+}
+
 export function subscribe(url: string) {
   const count = (refCounts.get(url) ?? 0) + 1;
   refCounts.set(url, count);
@@ -42,17 +69,16 @@ export function subscribe(url: string) {
     if (!store.has(url)) {
       store.set(url, { status: "loading", latency: null });
     }
-    check(url);
-    intervals.set(url, setInterval(() => check(url), 30_000));
+    startPolling(url);
   }
 
   return () => {
     const next = (refCounts.get(url) ?? 1) - 1;
     refCounts.set(url, next);
     if (next === 0) {
-      clearInterval(intervals.get(url));
-      intervals.delete(url);
+      stopPolling(url);
       refCounts.delete(url);
+      store.delete(url);
     }
   };
 }

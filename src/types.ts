@@ -10,13 +10,6 @@ export interface ServiceAdmin {
   url?: string;
 }
 
-export interface ServiceMetric {
-  label: string;
-  value: string | number;
-  status?: "ok" | "warn" | "error";
-  url?: string;
-}
-
 export interface Service {
   id: string;
   name: string;

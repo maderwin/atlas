@@ -9,7 +9,6 @@ from pathlib import Path
 import numpy as np
 import yaml
 from fastapi import FastAPI, Query
-from fastapi.middleware.cors import CORSMiddleware
 from model2vec import StaticModel
 
 DATA_DIR = Path(os.environ.get("DATA_DIR", "/data"))
@@ -17,7 +16,6 @@ MODEL_NAME = os.environ.get("MODEL_NAME", "minishlab/potion-multilingual-128M")
 RELOAD_INTERVAL = int(os.environ.get("RELOAD_INTERVAL", "60"))
 
 app = FastAPI(title="Atlas Embed")
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 model: StaticModel | None = None
 services: list[dict] = []
@@ -60,7 +58,7 @@ def load_services(path: Path) -> list[dict]:
 
 
 def file_hash(path: Path) -> str:
-    h = hashlib.md5()
+    h = hashlib.sha256()
     for f in sorted(path.parent.glob("*.yaml")):
         h.update(f.read_bytes())
     return h.hexdigest()
@@ -97,7 +95,7 @@ async def startup():
 
 
 @app.get("/api/search")
-async def search(q: str = Query(..., min_length=1), limit: int = Query(20, ge=1, le=100)):
+async def search(q: str = Query(..., min_length=1, max_length=500), limit: int = Query(20, ge=1, le=100)):
     maybe_reload()
     if model is None or service_embeddings is None or len(services) == 0:
         return {"results": []}
@@ -129,7 +127,7 @@ async def embeddings():
 
 
 @app.get("/api/embed")
-async def embed_query(q: str = Query(..., min_length=1)):
+async def embed_query(q: str = Query(..., min_length=1, max_length=500)):
     """Embed a single query for client-side similarity."""
     if model is None:
         return {"embedding": []}

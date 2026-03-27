@@ -15,12 +15,21 @@ interface SearchResult {
   score: number;
 }
 
-// IndexedDB helpers
+// Shared IndexedDB connection
+let dbInstance: IDBDatabase | null = null;
+
 function openDB(): Promise<IDBDatabase> {
+  if (dbInstance) return Promise.resolve(dbInstance);
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
     req.onupgradeneeded = () => req.result.createObjectStore(STORE_NAME);
-    req.onsuccess = () => resolve(req.result);
+    req.onsuccess = () => {
+      dbInstance = req.result;
+      dbInstance.onclose = () => {
+        dbInstance = null;
+      };
+      resolve(dbInstance);
+    };
     req.onerror = () => reject(req.error);
   });
 }
@@ -107,6 +116,3 @@ export async function semanticSearch(query: string): Promise<SearchResult[]> {
     .filter((r) => r.score > 0.1)
     .sort((a, b) => b.score - a.score);
 }
-
-// Preload embeddings on import
-loadEmbeddings();

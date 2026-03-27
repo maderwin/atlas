@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import type { Service, ServiceLink } from "../types";
 import { getLinkColor } from "../types";
 import { LinkCard } from "./LinkCard";
@@ -65,7 +65,7 @@ interface ServiceEntryProps {
   onTagClick: (q: string) => void;
 }
 
-export function ServiceEntry({ service, query, semantic, expanded = false, onToggle, onTagClick }: ServiceEntryProps) {
+export const ServiceEntry = memo(function ServiceEntry({ service, query, semantic, expanded = false, onToggle, onTagClick }: ServiceEntryProps) {
   const [modalLink, setModalLink] = useState<ServiceLink | null>(null);
 
   return (
@@ -177,4 +177,4 @@ export function ServiceEntry({ service, query, semantic, expanded = false, onTog
       </Modal>
     </>
   );
-}
+});

@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
+import { Virtuoso } from "react-virtuoso";
 import { useServices } from "./useServices";
 import { useSearch, SearchResultItem } from "./useSearch";
 import { Navbar } from "./components/Navbar";
@@ -37,19 +38,24 @@ export function App() {
         {!loading && !error && services.length === 0 && (
           <p className="text-center text-gray-500">No services found.</p>
         )}
-        <div className="flex flex-col gap-3">
-          {items.map((item) => (
-            <ServiceEntry
-              key={item.service.id}
-              service={item.service}
-              query={query}
-              semantic={item.semantic}
-              expanded={expandedIds.has(item.service.id)}
-              onToggle={() => toggleExpanded(item.service.id)}
-              onTagClick={setQuery}
-            />
-          ))}
-        </div>
+        <Virtuoso
+          useWindowScroll
+          data={items}
+          defaultItemHeight={80}
+          increaseViewportBy={400}
+          itemContent={(_index, item) => (
+            <div className="pb-3">
+              <ServiceEntry
+                service={item.service}
+                query={query}
+                semantic={item.semantic}
+                expanded={expandedIds.has(item.service.id)}
+                onToggle={() => toggleExpanded(item.service.id)}
+                onTagClick={setQuery}
+              />
+            </div>
+          )}
+        />
       </main>
     </div>
   );
