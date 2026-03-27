@@ -3,4 +3,6 @@ Dockerfile
 node_modules
 dist
 .git
+.github
 README.md
+src/__tests__

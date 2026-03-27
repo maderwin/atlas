@@ -1,15 +1,14 @@
 FROM node:22-alpine AS build
+RUN corepack enable && corepack prepare pnpm@latest --activate
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 COPY . .
 ARG VITE_SERVICES_YAML_URL=/data/services.yaml
-RUN npm run build
-# Remove any bundled YAML data
-RUN rm -f dist/services.yaml dist/vibe.yaml
+RUN pnpm build
+RUN rm -f dist/services.yaml dist/extra.yaml
 
 FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-RUN mkdir -p /usr/share/nginx/html/data
 EXPOSE 80

@@ -1,0 +1,18 @@
+pre-commit:
+  parallel: true
+  jobs:
+    - name: oxlint
+      glob: "*.{js,ts,jsx,tsx}"
+      run: pnpm oxlint {staged_files}
+
+    - name: typecheck
+      run: pnpm tsc -b --noEmit
+
+    - name: stylelint
+      glob: "*.css"
+      run: pnpm stylelint {staged_files}
+
+commit-msg:
+  jobs:
+    - name: commitlint
+      run: pnpm commitlint --edit {1}
