@@ -43,13 +43,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Login to YC Container Registry
-        run: echo '${{ secrets.YC_SA_KEY_JSON }}' | docker login cr.yandex -u json_key --password-stdin
-
-      - name: Build
-        run: docker build -t cr.yandex/crpml6ifd12s8cbmbg3m/atlas:latest -t cr.yandex/crpml6ifd12s8cbmbg3m/atlas:${{ github.sha }} .
-
-      - name: Push
+      - name: Build image
         run: |
+          docker build \
+            -t cr.yandex/crpml6ifd12s8cbmbg3m/atlas:latest \
+            -t cr.yandex/crpml6ifd12s8cbmbg3m/atlas:${{ github.sha }} \
+            .
+
+      - name: Push to YC Container Registry
+        run: |
+          echo '${{ secrets.YC_SA_KEY_JSON }}' | docker login cr.yandex -u json_key --password-stdin
           docker push cr.yandex/crpml6ifd12s8cbmbg3m/atlas:latest
           docker push cr.yandex/crpml6ifd12s8cbmbg3m/atlas:${{ github.sha }}
