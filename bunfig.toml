@@ -1,7 +1,0 @@
-telemetry = false
-
-[install]
-frozenLockfile = false
-
-[install.lockfile]
-print = "yarn"

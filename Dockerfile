@@ -1,51 +1,15 @@
-FROM oven/bun:latest as base
-
-FROM base AS deps
+FROM node:22-alpine AS build
 WORKDIR /app
-
-COPY ./package.json .
-COPY ./yarn.lock .
-COPY ./bun.lockb .
-
-RUN bun install
-
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY .env ./.env
+COPY package.json package-lock.json ./
+RUN npm ci
 COPY . .
+ARG VITE_SERVICES_YAML_URL=/data/services.yaml
+RUN npm run build
+# Remove any bundled YAML data
+RUN rm -f dist/services.yaml dist/vibe.yaml
 
-ENV NEXT_TELEMETRY_DISABLED 1
-ENV NODE_ENV production
-
-RUN bun run build
-
-FROM base AS runner
-WORKDIR /app
-
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-COPY --from=builder /app/public ./public
-
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
-
-COPY --from=builder /app/next.config.js ./
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
-COPY .env ./.env
-
-RUN chmod -R 777 /app/.next/cache
-
-USER nextjs
-
-EXPOSE 3000
-
-ENV PORT 3000
-# set hostname to localhost
-ENV HOSTNAME "0.0.0.0"
-
-CMD ["bun", "run", "start"]
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+RUN mkdir -p /usr/share/nginx/html/data
+EXPOSE 80

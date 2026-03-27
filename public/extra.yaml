@@ -1,0 +1,14 @@
+# Example of a referenced YAML file
+services:
+  - id: monitoring/grafana
+    name: Grafana
+    description: Monitoring and observability dashboards
+    url: http://grafana.example.com
+    tags: [monitoring, dashboards]
+    links:
+      - name: Overview
+        url: http://grafana.example.com/d/overview
+        type: dashboard
+      - name: API
+        url: http://grafana.example.com/api
+        type: api
