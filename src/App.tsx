@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useServices } from "./useServices";
-import { useSearch } from "./useSearch";
+import { useSearch, SearchResultItem } from "./useSearch";
 import { Navbar } from "./components/Navbar";
 import { ServiceEntry } from "./components/ServiceEntry";
 
@@ -8,10 +8,25 @@ export function App() {
   const { services, error, loading, lastUpdated, refresh } = useServices();
   const [query, setQuery] = useState("");
   const results = useSearch(services, query);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+
+  const items: SearchResultItem[] = useMemo(() => {
+    if (results) return results;
+    return services.map((s) => ({ service: s, score: 0 }));
+  }, [results, services]);
+
+  const toggleExpanded = useCallback((id: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
-      <Navbar query={query} onQueryChange={setQuery} />
+      <Navbar query={query} onQueryChange={setQuery} serviceCount={services.length} lastUpdated={lastUpdated} onRefresh={refresh} />
       <main className="mx-auto max-w-6xl px-4 pt-20 pb-12 sm:px-8">
         {loading && (
           <div className="flex justify-center py-20">
@@ -23,34 +38,18 @@ export function App() {
           <p className="text-center text-gray-500">No services found.</p>
         )}
         <div className="flex flex-col gap-3">
-          {results
-            ? results.map(({ item, score }) => (
-                <ServiceEntry key={item.id} service={item} score={score} onTagClick={setQuery} />
-              ))
-            : services.map((s) => <ServiceEntry key={s.id} service={s} onTagClick={setQuery} />)}
+          {items.map((item) => (
+            <ServiceEntry
+              key={item.service.id}
+              service={item.service}
+              query={query}
+              semantic={item.semantic}
+              expanded={expandedIds.has(item.service.id)}
+              onToggle={() => toggleExpanded(item.service.id)}
+              onTagClick={setQuery}
+            />
+          ))}
         </div>
-        {lastUpdated && services.length > 0 && (
-          <div className="mt-8 flex items-center justify-center gap-2 text-xs text-gray-400">
-            <span>
-              Updated {lastUpdated.toLocaleTimeString()} — {services.length} services
-            </span>
-            <button
-              onClick={refresh}
-              className="rounded p-1 transition-colors hover:bg-gray-200 dark:hover:bg-gray-800"
-              title="Refresh now"
-            >
-              <svg
-                className="h-3.5 w-3.5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-            </button>
-          </div>
-        )}
       </main>
     </div>
   );

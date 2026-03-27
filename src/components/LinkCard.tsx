@@ -1,31 +1,42 @@
 import type { ServiceLink } from "../types";
 import { getLinkColor } from "../types";
 
+function Highlight({ text, query }: { text: string; query: string }) {
+  if (!query || query.startsWith("[")) return <>{text}</>;
+  const idx = text.toLowerCase().indexOf(query.toLowerCase());
+  if (idx === -1) return <>{text}</>;
+  return (
+    <>
+      {text.slice(0, idx)}
+      <mark className="rounded bg-yellow-200/80 px-0.5 dark:bg-yellow-500/30">{text.slice(idx, idx + query.length)}</mark>
+      {text.slice(idx + query.length)}
+    </>
+  );
+}
+
 interface LinkCardProps {
   link: ServiceLink;
+  query: string;
   onInfoClick: () => void;
 }
 
-export function LinkCard({ link, onInfoClick }: LinkCardProps) {
+export function LinkCard({ link, query, onInfoClick }: LinkCardProps) {
   const color = getLinkColor(link);
 
   return (
-    <div
+    <a
+      href={link.url}
+      target="_blank"
+      rel="noopener noreferrer"
       className={`group relative flex min-w-[120px] flex-col rounded-lg border ${color.border} ${color.bg} p-3 transition-all duration-200 hover:scale-[1.03] hover:shadow-md`}
     >
-      <a
-        href={link.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`font-medium ${color.text} text-sm leading-tight hover:underline`}
-      >
-        {link.name}
-      </a>
+      <span className={`font-medium ${color.text} text-sm leading-tight`}><Highlight text={link.name} query={query} /></span>
       {link.type && (
         <span className="mt-1 text-[10px] uppercase tracking-wider opacity-50">{link.type}</span>
       )}
       <button
         onClick={(e) => {
+          e.preventDefault();
           e.stopPropagation();
           onInfoClick();
         }}
@@ -43,6 +54,6 @@ export function LinkCard({ link, onInfoClick }: LinkCardProps) {
           <path d="M12 16v-4M12 8h.01" />
         </svg>
       </button>
-    </div>
+    </a>
   );
 }

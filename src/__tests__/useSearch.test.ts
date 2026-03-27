@@ -18,13 +18,13 @@ describe("useSearch", () => {
   it("finds by name", () => {
     const { result } = renderHook(() => useSearch(services, "redis"));
     expect(result.current).not.toBeNull();
-    expect(result.current![0]!.item.id).toBe("redis");
+    expect(result.current![0]!.service.id).toBe("redis");
   });
 
   it("finds by tag", () => {
     const { result } = renderHook(() => useSearch(services, "[cache]"));
     expect(result.current).not.toBeNull();
-    expect(result.current![0]!.item.id).toBe("redis");
+    expect(result.current![0]!.service.id).toBe("redis");
   });
 
   it("returns results for partial match", () => {

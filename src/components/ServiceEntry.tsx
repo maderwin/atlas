@@ -5,10 +5,26 @@ import { LinkCard } from "./LinkCard";
 import { Modal } from "./Modal";
 import { StatusBadge } from "./StatusBadge";
 
+function Highlight({ text, query }: { text: string; query: string }) {
+  if (!query || query.startsWith("[")) return <>{text}</>;
+  const idx = text.toLowerCase().indexOf(query.toLowerCase());
+  if (idx === -1) return <>{text}</>;
+  return (
+    <>
+      {text.slice(0, idx)}
+      <mark className="rounded bg-yellow-200/80 px-0.5 dark:bg-yellow-500/30">{text.slice(idx, idx + query.length)}</mark>
+      {text.slice(idx + query.length)}
+    </>
+  );
+}
+
 function Tag({ tag, onClick }: { tag: string; onClick: (q: string) => void }) {
   return (
     <button
-      onClick={() => onClick(`[${tag}]`)}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick(`[${tag}]`);
+      }}
       className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
     >
       {tag}
@@ -42,17 +58,22 @@ function LinkDetail({ link }: { link: ServiceLink }) {
 
 interface ServiceEntryProps {
   service: Service;
-  score?: number;
+  query: string;
+  semantic?: boolean;
+  expanded?: boolean;
+  onToggle?: () => void;
   onTagClick: (q: string) => void;
 }
 
-export function ServiceEntry({ service, score, onTagClick }: ServiceEntryProps) {
+export function ServiceEntry({ service, query, semantic, expanded = false, onToggle, onTagClick }: ServiceEntryProps) {
   const [modalLink, setModalLink] = useState<ServiceLink | null>(null);
-  const [expanded, setExpanded] = useState(false);
 
   return (
     <>
-      <div className="group rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-200 hover:border-gray-200 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-700">
+      <div
+        className="group cursor-pointer rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-200 hover:border-gray-200 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-700"
+        onClick={onToggle}
+      >
         {/* Header row */}
         <div className="flex items-center gap-3">
           {/* Service name */}
@@ -62,12 +83,13 @@ export function ServiceEntry({ service, score, onTagClick }: ServiceEntryProps) 
                 href={service.url}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
                 className="text-lg font-semibold text-primary hover:underline"
               >
-                {service.name}
+                <Highlight text={service.name} query={query} />
               </a>
             ) : (
-              <span className="text-lg font-semibold">{service.name}</span>
+              <span className="text-lg font-semibold"><Highlight text={service.name} query={query} /></span>
             )}
           </div>
 
@@ -79,50 +101,37 @@ export function ServiceEntry({ service, score, onTagClick }: ServiceEntryProps) 
           {/* Status badge */}
           {service.status_url && <StatusBadge url={service.status_url} />}
 
-          {/* Score */}
-          {score !== undefined && (
-            <span className="ml-auto text-xs tabular-nums text-gray-400">{score.toFixed(3)}</span>
+          {/* Semantic badge */}
+          {semantic && (
+            <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-medium text-violet-600 dark:bg-violet-900/40 dark:text-violet-300">
+              semantic
+            </span>
           )}
 
-          {/* Expand toggle for details */}
-          {(service.description || service.admins) && (
-            <button
-              onClick={() => setExpanded((e) => !e)}
-              className="ml-auto rounded-md p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
-              title={expanded ? "Collapse" : "Expand details"}
-            >
-              <svg
-                className={`h-4 w-4 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-          )}
+          {/* Expand chevron */}
+          <svg
+            className={`ml-auto h-4 w-4 shrink-0 text-gray-400 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+          >
+            <path d="M19 9l-7 7-7-7" />
+          </svg>
         </div>
 
         {/* Expanded details */}
-        <div
-          className={`grid transition-all duration-200 ${expanded ? "mt-2 grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
-        >
-          <div className="overflow-hidden">
+        {expanded && (
+          <div className="mt-2">
             {service.description && (
-              <p className="text-sm text-gray-600 dark:text-gray-400">{service.description}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400"><Highlight text={service.description} query={query} /></p>
             )}
             {service.admins && (
               <div className="mt-1 flex gap-3 text-sm text-gray-500">
                 {service.admins.map((admin) => (
                   <span key={admin.username}>
                     {admin.url ? (
-                      <a
-                        href={admin.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="hover:text-primary"
-                      >
+                      <a href={admin.url} target="_blank" rel="noopener noreferrer" className="hover:text-primary">
                         @{admin.username}
                       </a>
                     ) : (
@@ -133,13 +142,13 @@ export function ServiceEntry({ service, score, onTagClick }: ServiceEntryProps) 
               </div>
             )}
           </div>
-        </div>
+        )}
 
-        {/* Link cards — horizontal scroll */}
+        {/* Link cards */}
         {service.links && service.links.length > 0 && (
-          <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+          <div className="mt-3 flex gap-2 overflow-x-auto p-1" onClick={(e) => e.stopPropagation()}>
             {service.links.map((link) => (
-              <LinkCard key={link.url} link={link} onInfoClick={() => setModalLink(link)} />
+              <LinkCard key={link.url} link={link} query={query} onInfoClick={() => setModalLink(link)} />
             ))}
           </div>
         )}

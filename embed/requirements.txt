@@ -1,0 +1,5 @@
+fastapi[standard]
+uvicorn
+model2vec>=0.8.0
+numpy
+pyyaml

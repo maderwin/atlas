@@ -25,7 +25,7 @@ export function Modal({ open, onClose, children }: ModalProps) {
       }}
       className="backdrop:bg-black/50 backdrop:backdrop-blur-sm bg-transparent p-0 m-auto max-w-2xl w-full open:animate-[modal-in_200ms_ease-out] [&:not([open])]:animate-[modal-out_150ms_ease-in]"
     >
-      <div className="rounded-xl bg-white p-6 shadow-2xl dark:bg-gray-800">
+      <div className="rounded-xl bg-white p-6 text-gray-900 shadow-2xl dark:bg-gray-800 dark:text-gray-100">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
